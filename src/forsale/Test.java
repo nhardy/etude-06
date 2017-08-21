@@ -5,6 +5,7 @@
  */
 package forsale;
 
+import implementations.*;
 import java.util.ArrayList;
 
 /**
@@ -48,12 +49,16 @@ public class Test {
             }
             
         };
+
+        Strategy basicStrategy = new BasicStrategy();
         
         ArrayList<Player> players = new ArrayList<Player>();
-        for(int i = 0; i < 3; i++) {
-            players.add(new Player("N" + ((char) ('A' + i)), s));
-            players.add(new Player("R"+ ((char) ('A' + i)), r));
-        }
+        players.add(new Player("Null 1", s));
+        players.add(new Player("Null 2", s));
+        players.add(new Player("Random 1", r));
+        players.add(new Player("Random 2", r));
+        players.add(new Player("Basic 1", basicStrategy));
+        players.add(new Player("Basic 2", basicStrategy));
         GameManager g = new GameManager(players);
         g.run();
         System.out.println(g.getLog());
