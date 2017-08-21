@@ -1,2 +1,3 @@
-# etude-06
-COSC326 Étude 6
+# Étude 6
+
+See http://www.cs.otago.ac.nz/cosc326/PDF/6-Sale.pdf for more details.
