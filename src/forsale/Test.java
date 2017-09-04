@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;;
+import java.util.Map;
 
 /**
  *
@@ -58,7 +58,7 @@ public class Test {
 
         HashMap<String, Integer> wins = new HashMap<String, Integer>();
 
-        for (int n = 0; n < 1000; n++) {
+        for (int n = 0; n < 100000; n++) {
             ArrayList<Player> players = new ArrayList<Player>();
 
             players.add(new Player("Null 1", s));
