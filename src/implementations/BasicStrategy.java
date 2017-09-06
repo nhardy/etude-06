@@ -21,29 +21,33 @@ public class BasicStrategy implements Strategy {
             totalPropertyValuesRemaining += c.getQuality();
         }
 
+        // "Market Value" for 1 point of Quality is determined by the total cash remaining
+        // divided among all of the remaining property values
         double marketValue = totalCashRemaining / (double) totalPropertyValuesRemaining;
 
-        int lowestValue = Integer.MAX_VALUE;
-        int highestValue = Integer.MIN_VALUE;
-        for (Card c: auction.getCardsInAuction()) {
-            if (c.getQuality() < lowestValue) lowestValue = c.getQuality();
-            if (c.getQuality() > highestValue) highestValue = c.getQuality();
-        }
+        ArrayList<Card> cardsInAuction = new ArrayList<Card>();
+        cardsInAuction.addAll(auction.getCardsInAuction());
+        Collections.sort(cardsInAuction, new CardComparator());
 
-        double lowestPropertyValue = lowestValue * marketValue;
-        double highestPropertyValue = highestValue * marketValue;
-        log("----- DEBUG -----");
-        log("totalCashRemaining: " + totalCashRemaining);
-        log("totalPropertyValuesRemaining: " + totalPropertyValuesRemaining);
-        log("Market value for " + lowestValue + ": " + lowestPropertyValue);
-        log("Market value for " + highestValue + ": " + highestPropertyValue);
-        log("Lowest Property Quality: " + lowestValue);
-        log("Current Bid is: " + auction.getCurrentBid());
-        log("Player's Cash: " + player.getCash());
-        log("----- DEBUG -----");
-        if (auction.getCurrentBid() > lowestPropertyValue) {
-            return -1;
-        } else if (auction.getCurrentBid() < highestPropertyValue || player.getCash() < auction.getCurrentBid() + 1) {
+        // double ratioAimingFor = 0;
+        // Card cardAimingFor = null;
+        // for (int i = 0; i < cardsInAuction.size(); i++) {
+        //     Card c = cardsInAuction.get(i);
+        //     int anticipatedBid = auction.getCurrentBid() + ((totalCashRemaining - auction.getCurrentBid()) * (auction.getPlayers().size() - auction.getPlayersInAuction().size())) / auction.getPlayersInAuction().size();
+        //     double ratio = (c.getQuality() * marketValue) / anticipatedBid;
+        //     if (ratio > ratioAimingFor && player.getCash() >= anticipatedBid) {
+        //         ratioAimingFor = ratio;
+        //         cardAimingFor = c;
+        //     }
+        // }
+
+        // if (cardAimingFor == null || player.getCash() < auction.getCurrentBid() + 1) {
+        //     return -1;
+        // } else {
+        //     return auction.getCurrentBid() + 1;
+        // }
+
+        if (auction.getCurrentBid() > cardsInAuction.get(0).getQuality() * marketValue  || player.getCash() < auction.getCurrentBid() + 1) {
             return -1;
         } else {
             return auction.getCurrentBid() + 1;
@@ -66,36 +70,44 @@ public class BasicStrategy implements Strategy {
 
         double marketValue = totalChequesRemaining / totalPropertyValuesRemaining;
 
-        int minChequeAvailable = Integer.MAX_VALUE;
-        int maxChequeAvailable = Integer.MIN_VALUE;
-        for (int cheque : sale.getChequesAvailable()) {
-            minChequeAvailable = Math.min(minChequeAvailable, cheque);
-            maxChequeAvailable = Math.max(maxChequeAvailable, cheque);
-        }
+        ArrayList<Integer> chequesAvailable = new ArrayList<Integer>();
+        chequesAvailable.addAll(sale.getChequesAvailable());
+        Collections.sort(chequesAvailable);
 
-        Card lowestHeld = null;
-        Card highestHeld = null;
-        ArrayList<Card> sortedCards = new ArrayList<Card>();
-        for (Card c : player.getCards()) {
-            sortedCards.add(c);
-            lowestHeld = lowestHeld == null || lowestHeld.getQuality() > c.getQuality() ? c : lowestHeld;
-            highestHeld = highestHeld == null || highestHeld.getQuality() < c.getQuality() ? c : highestHeld;
-        }
-        Collections.sort(sortedCards, new Comparator<Card>() {
-            @Override
-            public int compare(Card c1, Card c2) {
-                return c2.getQuality() - c1.getQuality();
+        ArrayList<Card> heldCards = new ArrayList<Card>();
+        heldCards.addAll(player.getCards());
+        Collections.sort(heldCards, new CardComparator());
+
+        ArrayList<Card> otherCards = new ArrayList<Card>();
+        for (PlayerRecord p : sale.getPlayers()) {
+            for (Card c : p.getCards()) {
+                if (!heldCards.contains(c)) otherCards.add(c);
             }
-        });
-
-        for (Card c : sortedCards) {
-            // TODO: replace maxChequeAvailable with most likely cheque
-            if (c.getQuality() * marketValue > maxChequeAvailable) return c;
         }
-        return lowestHeld;
+        Collections.sort(otherCards, new CardComparator());
+
+        // Find lowest card that exceeds the top value other card, and would be better than market value
+        for (int i = 0; i < otherCards.size(); i++) {
+            Card otherCard = otherCards.get(otherCards.size() - i - 1);
+            int chequeIndex = Math.max(0, chequesAvailable.size() - i - 1);
+            for (Card c : heldCards) {
+                if (c.getQuality() > otherCard.getQuality() && c.getQuality() * marketValue >= chequesAvailable.get(chequeIndex)) {
+                    return c;
+                }
+            }
+        }
+
+        return heldCards.get(0);
     }
 
     private void log(String output) {
         // System.out.println(output);
+    }
+
+    class CardComparator implements Comparator<Card> {
+        @Override
+        public int compare(Card c1, Card c2) {
+            return c2.getQuality() - c1.getQuality();
+        }
     }
 }
