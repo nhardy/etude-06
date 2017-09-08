@@ -15,7 +15,7 @@ public class SimpleTwo implements Strategy {
         int v1 = cardsInAuction.get(cardsInAuction.size() - 1).getQuality();
         int v2 = cardsInAuction.get(0).getQuality();
 
-        double diff = v2 - v1;
+        double diff = v1 - v2;
 
         // Bid if there is a big difference between the drop out card and the max card.
         if (diff >= 15){

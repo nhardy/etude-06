@@ -24,9 +24,9 @@ public class ImprovedStrategy implements Strategy {
         int v1 = cardsInAuction.get(0).getQuality();
         int v2 = cardsInAuction.get(cardsInAuction.size() - 1).getQuality();
 
-        double value = (v2 - v1)*ratio;
+        double value = (v2 - v1)*ratio*0.39;
 
-        if (value >= 15){
+        if (value >= auction.getCurrentBid()){
             return auction.getCurrentBid() + 1;
         }
         return -1;

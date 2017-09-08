@@ -101,6 +101,8 @@ public class Test {
             }
         };
 
+        Strategy anotherStategy = new AnotherStrategy();
+
         Strategy simpleTwo = new SimpleTwo();
 
         Strategy improvedStrategy = new ImprovedStrategy();
@@ -111,7 +113,7 @@ public class Test {
             ArrayList<Player> players = new ArrayList<Player>();
 
             players.add(new Player("Simple 1", simpleStrategy));
-            players.add(new Player("Simple 2", simpleStrategy));
+            players.add(new Player("Another", anotherStategy));
             players.add(new Player("Improved 1", improvedStrategy));
             players.add(new Player("Simple Two", simpleTwo));
             // players.add(new Player("MV2 Random 1", mv2RandomStrategy));
