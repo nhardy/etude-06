@@ -4,7 +4,6 @@ import forsale.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 public class ImprovedStrategy implements Strategy {
     @Override
@@ -18,8 +17,8 @@ public class ImprovedStrategy implements Strategy {
         cardsInAuction.addAll(auction.getCardsInAuction());
         Collections.sort(cardsInAuction, new CardComparator());
 
-        int v1 = cardsInAuction.get(cardsInAuction.size() - 1).getQuality();
-        int v2 = cardsInAuction.get(0).getQuality();
+        int v1 = cardsInAuction.get(0).getQuality();
+        int v2 = cardsInAuction.get(cardsInAuction.size() - 1).getQuality();
 
         double value = v2 - v1;
 
@@ -78,12 +77,5 @@ public class ImprovedStrategy implements Strategy {
 
     private void log(String output) {
         System.out.println(output);
-    }
-
-    class CardComparator implements Comparator<Card> {
-        @Override
-        public int compare(Card c1, Card c2) {
-            return c2.getQuality() - c1.getQuality();
-        }
     }
 }

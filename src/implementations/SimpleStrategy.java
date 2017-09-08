@@ -4,7 +4,6 @@ import forsale.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 public class SimpleStrategy implements Strategy {
     @Override
@@ -69,12 +68,5 @@ public class SimpleStrategy implements Strategy {
 
     private void log(String output) {
         //System.out.println(output);
-    }
-
-    class CardComparator implements Comparator<Card> {
-        @Override
-        public int compare(Card c1, Card c2) {
-            return c2.getQuality() - c1.getQuality();
-        }
     }
 }

@@ -2,11 +2,10 @@ package implementations;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import forsale.*;
 
-public class BasicStrategy implements Strategy {
+public class MarketValue1Strategy implements Strategy {
     @Override
     public int bid(PlayerRecord player, AuctionState auction) {
         int roundsLeft = auction.getCardsInDeck().size() / auction.getPlayers().size();
@@ -15,10 +14,10 @@ public class BasicStrategy implements Strategy {
         for (PlayerRecord p : roundsLeft == 0 ? auction.getPlayersInAuction() : auction.getPlayers()) {
             totalCashRemaining += p.getCash();
         }
-        int totalCashRemainingInAuction = 0;
-        for (PlayerRecord p : auction.getPlayersInAuction()) {
-            totalCashRemainingInAuction += p.getCash();
-        }
+        // int totalCashRemainingInAuction = 0;
+        // for (PlayerRecord p : auction.getPlayersInAuction()) {
+        //     totalCashRemainingInAuction += p.getCash();
+        // }
         int totalPropertyValuesRemaining = 0;
         for (Card c : auction.getCardsInAuction()) {
             totalPropertyValuesRemaining += c.getQuality();
@@ -35,32 +34,11 @@ public class BasicStrategy implements Strategy {
         cardsInAuction.addAll(auction.getCardsInAuction());
         Collections.sort(cardsInAuction, new CardComparator());
 
-        double ratioAimingFor = 0;
-        Card cardAimingFor = null;
-        for (int i = 0; i < cardsInAuction.size(); i++) {
-            Card c = cardsInAuction.get(i);
-            int anticipatedMaxBid = Math.max(
-                (int) Math.round((totalCashRemainingInAuction - player.getCash()) / (auction.getPlayersInAuction().size() - 1) / (roundsLeft * 0.5 + 1)),
-                auction.getCurrentBid() + 1
-            );
-            double ratio = (c.getQuality() * marketValue) / anticipatedMaxBid;
-            if (ratio > ratioAimingFor && player.getCash() >= anticipatedMaxBid) {
-                ratioAimingFor = ratio;
-                cardAimingFor = c;
-            }
-        }
-
-        if (cardAimingFor == null || player.getCash() < auction.getCurrentBid() + 1) {
+        if (auction.getCurrentBid() + 1 >= cardsInAuction.get(0).getQuality() * marketValue * 2 || player.getCash() < auction.getCurrentBid() + 1) {
             return -1;
         } else {
             return auction.getCurrentBid() + 1;
         }
-
-        // if (auction.getCurrentBid() >= cardsInAuction.get(0).getQuality() * marketValue / 2 || player.getCash() < auction.getCurrentBid() + 1) {
-        //     return -1;
-        // } else {
-        //     return auction.getCurrentBid() + 1;
-        // }
     }
 
     @Override
@@ -111,12 +89,5 @@ public class BasicStrategy implements Strategy {
 
     private void log(String output) {
         // System.out.println(output);
-    }
-
-    class CardComparator implements Comparator<Card> {
-        @Override
-        public int compare(Card c1, Card c2) {
-            return c2.getQuality() - c1.getQuality();
-        }
     }
 }

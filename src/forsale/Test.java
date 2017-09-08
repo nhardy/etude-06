@@ -56,21 +56,22 @@ public class Test {
 
         Strategy simpleStrategy = new SimpleStrategy();
 
-        Strategy basicStrategy = new BasicStrategy();
+        Strategy mv1Strategy = new MarketValue1Strategy();
+        Strategy mv2Strategy = new MarketValue2Strategy();
 
         Strategy improvedStrategy = new ImprovedStrategy();
 
         HashMap<String, Integer> wins = new HashMap<String, Integer>();
 
-        for (int n = 0; n < 100000; n++) {
+        for (int n = 0; n < 10000; n++) {
             ArrayList<Player> players = new ArrayList<Player>();
 
             players.add(new Player("Simple 1", simpleStrategy));
             players.add(new Player("Simple 2", simpleStrategy));
             players.add(new Player("Improved 1", improvedStrategy));
             players.add(new Player("Improved 2", improvedStrategy));
-            players.add(new Player("Basic 1", basicStrategy));
-            players.add(new Player("Basic 2", basicStrategy));
+            players.add(new Player("Market Value 1", mv1Strategy));
+            players.add(new Player("Market Value 2", mv2Strategy));
             Collections.shuffle(players);
             GameManager g = new GameManager(players);
             g.run();
