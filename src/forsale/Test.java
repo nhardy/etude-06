@@ -54,9 +54,11 @@ public class Test {
 
         };
 
-        Strategy simpleStrategy = new BasicStrategy();
+        Strategy simpleStrategy = new SimpleStrategy();
 
-        Strategy basicStrategy = new SimpleStrategy();
+        Strategy basicStrategy = new BasicStrategy();
+
+        Strategy improvedStrategy = new ImprovedStrategy();
 
         HashMap<String, Integer> wins = new HashMap<String, Integer>();
 
@@ -65,8 +67,8 @@ public class Test {
 
             players.add(new Player("Simple 1", simpleStrategy));
             players.add(new Player("Simple 2", simpleStrategy));
-            players.add(new Player("Random 1", r));
-            players.add(new Player("Random 2", r));
+            players.add(new Player("Improved 1", improvedStrategy));
+            players.add(new Player("Improved 2", improvedStrategy));
             players.add(new Player("Basic 1", basicStrategy));
             players.add(new Player("Basic 2", basicStrategy));
             Collections.shuffle(players);
