@@ -56,8 +56,50 @@ public class Test {
 
         Strategy simpleStrategy = new SimpleStrategy();
 
-        Strategy mv1Strategy = new MarketValue1Strategy();
-        Strategy mv2Strategy = new MarketValue2Strategy();
+        Strategy mv1Strategy = new Strategy() {
+            @Override
+            public int bid(PlayerRecord player, AuctionState auction) {
+                return new MarketValue1BidStrategy().bid(player, auction);
+            }
+
+            @Override
+            public Card chooseCard(PlayerRecord player, SaleState sale) {
+                return new BasicChooseCardStrategy().chooseCard(player, sale);
+            }
+        };
+        Strategy mv2BasicStrategy = new Strategy() {
+            @Override
+            public int bid(PlayerRecord player, AuctionState auction) {
+                return new MarketValue2BidStrategy().bid(player, auction);
+            }
+
+            @Override
+            public Card chooseCard(PlayerRecord player, SaleState sale) {
+                return new BasicChooseCardStrategy().chooseCard(player, sale);
+            }
+        };
+        Strategy mv2RandomStrategy = new Strategy() {
+            @Override
+            public int bid(PlayerRecord player, AuctionState auction) {
+                return new MarketValue2BidStrategy().bid(player, auction);
+            }
+
+            @Override
+            public Card chooseCard(PlayerRecord player, SaleState sale) {
+                return new RandomChooseCardStrategy().chooseCard(player, sale);
+            }
+        };
+        Strategy mv2ImprovedStrategy = new Strategy() {
+            @Override
+            public int bid(PlayerRecord player, AuctionState auction) {
+                return new MarketValue2BidStrategy().bid(player, auction);
+            }
+
+            @Override
+            public Card chooseCard(PlayerRecord player, SaleState sale) {
+                return new ImprovedChooseCardStrategy().chooseCard(player, sale);
+            }
+        };
 
         Strategy simpleTwo = new SimpleTwo();
 
@@ -72,8 +114,12 @@ public class Test {
             players.add(new Player("Simple 2", simpleStrategy));
             players.add(new Player("Improved 1", improvedStrategy));
             players.add(new Player("Simple Two", simpleTwo));
-            players.add(new Player("Market Value 1", mv1Strategy));
-            players.add(new Player("Market Value 2", mv2Strategy));
+            // players.add(new Player("MV2 Random 1", mv2RandomStrategy));
+            // players.add(new Player("MV2 Random 2", mv2RandomStrategy));
+            players.add(new Player("MV2 Basic 1", mv2BasicStrategy));
+            players.add(new Player("MV2 Basic 2", mv2BasicStrategy));
+            // players.add(new Player("MV2 Improved 1", mv2ImprovedStrategy));
+            // players.add(new Player("MV2 Improved 2", mv2ImprovedStrategy));
             Collections.shuffle(players);
             GameManager g = new GameManager(players);
             g.run();

@@ -1,7 +1,8 @@
 package implementations;
 
-import forsale.*;
 import java.util.Comparator;
+
+import forsale.*;
 
 public class CardComparator implements Comparator<Card> {
     @Override
