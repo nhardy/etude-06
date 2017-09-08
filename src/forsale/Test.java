@@ -55,6 +55,8 @@ public class Test {
         };
 
         Strategy simpleStrategy = new SimpleStrategy();
+        
+        Strategy simpleTwo = new SimpleTwo();
 
         Strategy basicStrategy = new BasicStrategy();
 
@@ -68,7 +70,7 @@ public class Test {
             players.add(new Player("Simple 1", simpleStrategy));
             players.add(new Player("Simple 2", simpleStrategy));
             players.add(new Player("Improved 1", improvedStrategy));
-            players.add(new Player("Improved 2", improvedStrategy));
+            players.add(new Player("Simple Two", simpleTwo));
             players.add(new Player("Basic 1", basicStrategy));
             players.add(new Player("Basic 2", basicStrategy));
             Collections.shuffle(players);

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class ImprovedStrategy implements Strategy {
+public class SimpleTwo implements Strategy {
     @Override
     public int bid(PlayerRecord player, AuctionState auction) {
         ArrayList<Card> cardsInAuction = new ArrayList<Card>();
@@ -16,10 +16,10 @@ public class ImprovedStrategy implements Strategy {
         int v1 = cardsInAuction.get(cardsInAuction.size() - 1).getQuality();
         int v2 = cardsInAuction.get(0).getQuality();
 
-        double value = v2 - v1;
+        double diff = v2 - v1;
 
-        //Bid if the current bid is smaller than the max_bid.
-        if (value >= 15){
+        // Bid if there is a big difference between the drop out card and the max card.
+        if (diff >= 15){
             return auction.getCurrentBid() + 1;
         }
         return -1;
