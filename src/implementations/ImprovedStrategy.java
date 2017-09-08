@@ -9,6 +9,15 @@ import java.util.Comparator;
 public class ImprovedStrategy implements Strategy {
     @Override
     public int bid(PlayerRecord player, AuctionState auction) {
+
+        int playerCount = auction.getPlayers().size();
+        int round = auction.getCardsInDeck().size()/playerCount;
+
+        //Calculate how much money we have vs how much money we should have on average
+        int averageSpent = 14/playerCount;
+        int playerSpend = player.getCash()/(round + 1);
+        double ratio = (double) playerSpend/averageSpent;
+
         ArrayList<Card> cardsInAuction = new ArrayList<Card>();
         cardsInAuction.addAll(auction.getCardsInAuction());
         Collections.sort(cardsInAuction, new CardComparator());
@@ -16,9 +25,8 @@ public class ImprovedStrategy implements Strategy {
         int v1 = cardsInAuction.get(cardsInAuction.size() - 1).getQuality();
         int v2 = cardsInAuction.get(0).getQuality();
 
-        double value = v2 - v1;
+        double value = (v2 - v1)*ratio;
 
-        //Bid if the current bid is smaller than the max_bid.
         if (value >= 15){
             return auction.getCurrentBid() + 1;
         }

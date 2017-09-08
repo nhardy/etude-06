@@ -55,7 +55,7 @@ public class Test {
         };
 
         Strategy simpleStrategy = new SimpleStrategy();
-        
+
         Strategy simpleTwo = new SimpleTwo();
 
         Strategy basicStrategy = new BasicStrategy();
@@ -64,7 +64,7 @@ public class Test {
 
         HashMap<String, Integer> wins = new HashMap<String, Integer>();
 
-        for (int n = 0; n < 100000; n++) {
+        for (int n = 0; n < 10000; n++) {
             ArrayList<Player> players = new ArrayList<Player>();
 
             players.add(new Player("Simple 1", simpleStrategy));
