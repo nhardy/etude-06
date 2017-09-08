@@ -9,9 +9,15 @@ import forsale.*;
 public class BasicStrategy implements Strategy {
     @Override
     public int bid(PlayerRecord player, AuctionState auction) {
+        int roundsLeft = auction.getCardsInDeck().size() / auction.getPlayers().size();
+
         int totalCashRemaining = 0;
-        for (PlayerRecord p: auction.getPlayersInAuction()) {
+        for (PlayerRecord p : roundsLeft == 0 ? auction.getPlayersInAuction() : auction.getPlayers()) {
             totalCashRemaining += p.getCash();
+        }
+        int totalCashRemainingInAuction = 0;
+        for (PlayerRecord p : auction.getPlayersInAuction()) {
+            totalCashRemainingInAuction += p.getCash();
         }
         int totalPropertyValuesRemaining = 0;
         for (Card c : auction.getCardsInAuction()) {
@@ -29,29 +35,32 @@ public class BasicStrategy implements Strategy {
         cardsInAuction.addAll(auction.getCardsInAuction());
         Collections.sort(cardsInAuction, new CardComparator());
 
-        // double ratioAimingFor = 0;
-        // Card cardAimingFor = null;
-        // for (int i = 0; i < cardsInAuction.size(); i++) {
-        //     Card c = cardsInAuction.get(i);
-        //     int anticipatedBid = auction.getCurrentBid() + ((totalCashRemaining - auction.getCurrentBid()) * (auction.getPlayers().size() - auction.getPlayersInAuction().size())) / auction.getPlayersInAuction().size();
-        //     double ratio = (c.getQuality() * marketValue) / anticipatedBid;
-        //     if (ratio > ratioAimingFor && player.getCash() >= anticipatedBid) {
-        //         ratioAimingFor = ratio;
-        //         cardAimingFor = c;
-        //     }
-        // }
+        double ratioAimingFor = 0;
+        Card cardAimingFor = null;
+        for (int i = 0; i < cardsInAuction.size(); i++) {
+            Card c = cardsInAuction.get(i);
+            int anticipatedMaxBid = Math.max(
+                (int) Math.round((totalCashRemainingInAuction - player.getCash()) / (auction.getPlayersInAuction().size() - 1) / (roundsLeft * 0.5 + 1)),
+                auction.getCurrentBid() + 1
+            );
+            double ratio = (c.getQuality() * marketValue) / anticipatedMaxBid;
+            if (ratio > ratioAimingFor && player.getCash() >= anticipatedMaxBid) {
+                ratioAimingFor = ratio;
+                cardAimingFor = c;
+            }
+        }
 
-        // if (cardAimingFor == null || player.getCash() < auction.getCurrentBid() + 1) {
-        //     return -1;
-        // } else {
-        //     return auction.getCurrentBid() + 1;
-        // }
-
-        if (auction.getCurrentBid() > cardsInAuction.get(0).getQuality() * marketValue  || player.getCash() < auction.getCurrentBid() + 1) {
+        if (cardAimingFor == null || player.getCash() < auction.getCurrentBid() + 1) {
             return -1;
         } else {
             return auction.getCurrentBid() + 1;
         }
+
+        // if (auction.getCurrentBid() >= cardsInAuction.get(0).getQuality() * marketValue / 2 || player.getCash() < auction.getCurrentBid() + 1) {
+        //     return -1;
+        // } else {
+        //     return auction.getCurrentBid() + 1;
+        // }
     }
 
     @Override
