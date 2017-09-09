@@ -23,89 +23,24 @@ public class Test {
      */
     public static void main(String[] args) {
 
-        // A null strategy - never bid, always play your top card.
-        Strategy s = new Strategy() {
+        Strategy mv1Strategy = new CreateStrategy(new MarketValue1BidStrategy(), new BasicChooseCardStrategy());
 
-            @Override
-            public int bid(PlayerRecord p, AuctionState a) {
-                return -1;
-            }
+        Strategy mv2BasicStrategy = new CreateStrategy(new MarketValue2BidStrategy(), new BasicChooseCardStrategy());
 
-            @Override
-            public Card chooseCard(PlayerRecord p, SaleState s) {
-                return p.getCards().get(0);
-            }
+        Strategy mv2RandomStrategy = new CreateStrategy(new MarketValue2BidStrategy(), new RandomChooseCardStrategy());
 
-        };
+        Strategy mv2ImprovedStrategy = new CreateStrategy(new MarketValue2BidStrategy(), new ImprovedChooseCardStrategy());
 
-        // A random strategy - make a random bid up to your amount remaining,
-        // choose a rand card to sell.
-        Strategy r = new Strategy() {
 
-            @Override
-            public int bid(PlayerRecord p, AuctionState a) {
-                return (int) (1 + (Math.random()*p.getCash()));
-            }
+        Strategy anotherStrategy = new AnotherStrategy();
 
-            @Override
-            public Card chooseCard(PlayerRecord p, SaleState s) {
-                return p.getCards().get((int) (Math.random()*p.getCards().size()));
-            }
 
-        };
+        Strategy simpleStrategy = new CreateStrategy(new SimpleStrategy(), new BasicChooseCardStrategy());
 
-        Strategy simpleStrategy = new SimpleStrategy();
+        Strategy simpleTwo = new CreateStrategy(new SimpleTwo(), new BasicChooseCardStrategy());
 
-        Strategy mv1Strategy = new Strategy() {
-            @Override
-            public int bid(PlayerRecord player, AuctionState auction) {
-                return new MarketValue1BidStrategy().bid(player, auction);
-            }
+        Strategy improvedStrategy = new CreateStrategy (new ImprovedStrategy(),new BasicChooseCardStrategy());
 
-            @Override
-            public Card chooseCard(PlayerRecord player, SaleState sale) {
-                return new BasicChooseCardStrategy().chooseCard(player, sale);
-            }
-        };
-        Strategy mv2BasicStrategy = new Strategy() {
-            @Override
-            public int bid(PlayerRecord player, AuctionState auction) {
-                return new MarketValue2BidStrategy().bid(player, auction);
-            }
-
-            @Override
-            public Card chooseCard(PlayerRecord player, SaleState sale) {
-                return new BasicChooseCardStrategy().chooseCard(player, sale);
-            }
-        };
-        Strategy mv2RandomStrategy = new Strategy() {
-            @Override
-            public int bid(PlayerRecord player, AuctionState auction) {
-                return new MarketValue2BidStrategy().bid(player, auction);
-            }
-
-            @Override
-            public Card chooseCard(PlayerRecord player, SaleState sale) {
-                return new RandomChooseCardStrategy().chooseCard(player, sale);
-            }
-        };
-        Strategy mv2ImprovedStrategy = new Strategy() {
-            @Override
-            public int bid(PlayerRecord player, AuctionState auction) {
-                return new MarketValue2BidStrategy().bid(player, auction);
-            }
-
-            @Override
-            public Card chooseCard(PlayerRecord player, SaleState sale) {
-                return new ImprovedChooseCardStrategy().chooseCard(player, sale);
-            }
-        };
-
-        Strategy anotherStategy = new AnotherStrategy();
-
-        Strategy simpleTwo = new SimpleTwo();
-
-        Strategy improvedStrategy = new ImprovedStrategy();
 
         HashMap<String, Integer> wins = new HashMap<String, Integer>();
 
@@ -113,7 +48,7 @@ public class Test {
             ArrayList<Player> players = new ArrayList<Player>();
 
             players.add(new Player("Simple 1", simpleStrategy));
-            players.add(new Player("Another", anotherStategy));
+            players.add(new Player("Another", anotherStrategy));
             players.add(new Player("Improved 1", improvedStrategy));
             players.add(new Player("Simple Two", simpleTwo));
             // players.add(new Player("MV2 Random 1", mv2RandomStrategy));

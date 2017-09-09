@@ -5,7 +5,7 @@ import forsale.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class SimpleTwo implements Strategy {
+public class SimpleTwo implements BidStrategy {
     @Override
     public int bid(PlayerRecord player, AuctionState auction) {
         ArrayList<Card> cardsInAuction = new ArrayList<Card>();
@@ -22,11 +22,6 @@ public class SimpleTwo implements Strategy {
             return auction.getCurrentBid() + 1;
         }
         return -1;
-    }
-
-    @Override
-    public Card chooseCard(PlayerRecord player, SaleState sale) {
-        return new BasicChooseCardStrategy().chooseCard(player, sale);
     }
 
     private void log(String output) {

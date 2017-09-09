@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import forsale.*;
 
-public class ImprovedStrategy implements Strategy {
+public class ImprovedStrategy implements BidStrategy {
     @Override
     public int bid(PlayerRecord player, AuctionState auction) {
 
@@ -13,8 +13,8 @@ public class ImprovedStrategy implements Strategy {
         int round = auction.getCardsInDeck().size()/playerCount;
 
         //Calculate how much money we have vs how much money we should have on average
-        int averageSpent = 14/playerCount;
-        int playerSpend = player.getCash()/(round + 1);
+        double averageSpent = 14.0/playerCount;
+        double playerSpend = (double)player.getCash()/(round + 1);
         double ratio = (double) playerSpend/averageSpent;
 
         ArrayList<Card> cardsInAuction = new ArrayList<Card>();
@@ -24,17 +24,22 @@ public class ImprovedStrategy implements Strategy {
         int v1 = cardsInAuction.get(0).getQuality();
         int v2 = cardsInAuction.get(cardsInAuction.size() - 1).getQuality();
 
+        //is this more than we want to spend?
+       // if ((double)player.getCash() / (round+1) < 2*auction.getCurrentBid()){
+         //   return -1;
+        //}
+        /*
+        System.out.println(v2-v1);
+        if (round == 0){
+            System.out.println("---------");
+        } */
+
         double value = (v2 - v1)*ratio*0.39;
 
         if (value >= auction.getCurrentBid()){
             return auction.getCurrentBid() + 1;
         }
         return -1;
-    }
-
-    @Override
-    public Card chooseCard(PlayerRecord player, SaleState sale) {
-        return new BasicChooseCardStrategy().chooseCard(player, sale);
     }
 
     private void log(String output) {

@@ -5,7 +5,7 @@ import forsale.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class SimpleStrategy implements Strategy {
+public class SimpleStrategy implements BidStrategy {
     @Override
     public int bid(PlayerRecord player, AuctionState auction) {
         //Calculate which round this is
@@ -18,11 +18,6 @@ public class SimpleStrategy implements Strategy {
             return auction.getCurrentBid() + 1;
         }
         return -1;
-    }
-
-    @Override
-    public Card chooseCard(PlayerRecord player, SaleState sale) {
-        return new BasicChooseCardStrategy().chooseCard(player, sale);
     }
 
     private void log(String output) {
