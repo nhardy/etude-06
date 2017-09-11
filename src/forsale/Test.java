@@ -7,7 +7,6 @@ package forsale;
 
 import implementations.*;
 
-import javax.print.attribute.standard.MediaSize;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -41,23 +40,23 @@ public class Test {
 
         Strategy simpleTwo = new CreateStrategy(new SimpleTwo(), new BasicChooseCardStrategy());
 
-        Strategy improvedStrategy = new CreateStrategy (new ImprovedStrategy(),new BasicChooseCardStrategy());
-
-        Strategy simulationStrategy = new CreateStrategy(new SimulationStrategy(),new BasicChooseCardStrategy());
-
         HashMap<String, Integer> wins = new HashMap<String, Integer>();
 
-        for (int n = 0; n < 50000; n++) {
+        for (int n = 0; n < 10000; n++) {
             ArrayList<Player> players = new ArrayList<Player>();
 
-            players.add(new Player("Another Strat", anotherStrategy));
-            players.add(new Player("MV Strat 1", mv2BasicStrategy));
-            players.add(new Player("Improved 1", improvedStrategy));
+            // players.add(new Player("Another Strat", anotherStrategy));
+
+            players.add(new Player("Improved 1", new CreateStrategy(new ImprovedStrategy(), new BasicChooseCardStrategy())));
+            players.add(new Player("Improved 2", new CreateStrategy(new ImprovedStrategy(), new ImprovedChooseCardStrategy())));
+
             players.add(new Player("Simple Two", simpleTwo));
             // players.add(new Player("MV2 Random 1", mv2RandomStrategy));
             // players.add(new Player("MV2 Random 2", mv2RandomStrategy));
             players.add(new Player("Other Group", new CreateStrategy(new OtherStrategy(), new BasicChooseCardStrategy() )));
-            players.add(new Player("Simulation Strategy", simulationStrategy));
+
+            players.add(new Player("Simulation Strategy", new CreateStrategy(new SimulationStrategy(), new BasicChooseCardStrategy())));
+            players.add(new Player("Simulation Strategy Improved", new CreateStrategy(new SimulationStrategy(), new ImprovedChooseCardStrategy())));
             // players.add(new Player("MV2 Improved 1", mv2ImprovedStrategy));
             // players.add(new Player("MV2 Improved 2", mv2ImprovedStrategy));
             Collections.shuffle(players);

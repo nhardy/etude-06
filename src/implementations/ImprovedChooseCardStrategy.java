@@ -7,59 +7,59 @@ import forsale.*;
 
 public class ImprovedChooseCardStrategy implements ChooseCardStrategy {
     public Card chooseCard(PlayerRecord player, SaleState sale) {
-        int totalChequesRemaining = 0;
-        for (int cheque : sale.getChequesRemaining()) {
-            totalChequesRemaining += cheque;
-        }
+        ArrayList<Card> heldCards = player.getCards();
+        Collections.sort(heldCards, new CardComparator());
 
-        int totalPropertyValuesRemaining = 0;
+        ArrayList<Card> allCards = new ArrayList<Card>();
+        ArrayList<Card> otherCards = new ArrayList<Card>();
         for (PlayerRecord p : sale.getPlayers()) {
-            for (Card c: p.getCards()) {
-                totalPropertyValuesRemaining += c.getQuality();
+            allCards.addAll(p.getCards());
+            if (!p.equals(player)) {
+                otherCards.addAll(p.getCards());
             }
         }
+        Collections.sort(allCards, new CardComparator());
+        Collections.sort(otherCards, new CardComparator());
 
-        double marketValue = totalChequesRemaining / (double) totalPropertyValuesRemaining;
+        ArrayList<Integer> chequesRemaining = new ArrayList<Integer>();
+        chequesRemaining.addAll(sale.getChequesRemaining());
+        Collections.sort(chequesRemaining);
 
         ArrayList<Integer> chequesAvailable = new ArrayList<Integer>();
         chequesAvailable.addAll(sale.getChequesAvailable());
         Collections.sort(chequesAvailable);
 
-        ArrayList<Card> heldCards = new ArrayList<Card>();
-        heldCards.addAll(player.getCards());
-        Collections.sort(heldCards, new CardComparator());
+        ArrayList<Integer> allCheques = new ArrayList<Integer>();
+        allCheques.addAll(chequesRemaining);
+        allCheques.addAll(chequesAvailable);
 
-        ArrayList<Card> otherCards = new ArrayList<Card>();
-        for (PlayerRecord p : sale.getPlayers()) {
-            for (Card c : p.getCards()) {
-                if (!heldCards.contains(c)) otherCards.add(c);
-            }
-        }
-        Collections.sort(otherCards, new CardComparator());
-
-        // System.out.println("Cheques Available: " + chequesAvailable);
-        // System.out.print("Hand: [" + heldCards.get(0) + " (" + heldCards.get(0).getQuality() + ")");
-        // for (int i = 1; i < heldCards.size(); i++) {
-        //     System.out.print(", " + heldCards.get(i) + " (" + heldCards.get(i).getQuality() + ")");
+        // int totalCheques = 0;
+        // for (int cheque : allCheques) {
+        //     totalCheques += cheque;
         // }
-        // System.out.println("]");
+        // int totalPropertyValue = 0;
+        // for (Card c : allCards) {
+        //     totalPropertyValue += c.getQuality();
+        // }
+        // double marketValue = totalCheques / (double) totalPropertyValue;
 
-        // Find lowest card that exceeds the top value other card, and would be better than market value
-        for (int i = 0; i < otherCards.size(); i++) {
-            Card otherCard = otherCards.get(otherCards.size() - i - 1);
-            int chequeIndex = Math.max(0, chequesAvailable.size() - i - 1);
-            for (Card c : heldCards) {
-                if (c.getQuality() > otherCard.getQuality() && c.getQuality() * marketValue <= chequesAvailable.get(chequeIndex)) {
-                    // System.out.println("Playing card: " + c + " (" + c.getQuality() + ")");
-                    // System.out.printf("%.3f", c.getQuality() * marketValue);
-                    // System.out.println("Cheques Remaining: " + sale.getChequesRemaining());
-                    return c;
-                }
+        int currentMaxCheque = chequesAvailable.get(chequesAvailable.size() - 1);
+        int maxOtherCard = otherCards.get(otherCards.size() - 1).getQuality();
+        if (currentMaxCheque == allCheques.get(allCheques.size() - 1)) {
+            for (Card c : player.getCards()) {
+                if (c.getQuality() > maxOtherCard
+                    // || (chequesRemaining.contains(currentMaxCheque) && c.getQuality() > maxOtherCard - 1 && Math.random() < 0.5)
+                ) return c;
             }
         }
 
-
-        // System.out.println("Playing lowest card: " + heldCards.get(0) + " (" + heldCards.get(0).getQuality() + ")");
+        // int currentMinCheque = chequesAvailable.get(0);
+        // if (currentMinCheque == 0) {
+        //     for (Card c : heldCards) {
+        //         // TODO: Tweak multiplier
+        //         if (c.getQuality() * marketValue * 1.5 > chequesAvailable.get(1)) return c;
+        //     }
+        // }
 
         return heldCards.get(0);
     }
