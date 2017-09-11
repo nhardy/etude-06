@@ -33,33 +33,23 @@ public class ImprovedChooseCardStrategy implements ChooseCardStrategy {
         allCheques.addAll(chequesRemaining);
         allCheques.addAll(chequesAvailable);
 
-        // int totalCheques = 0;
-        // for (int cheque : allCheques) {
-        //     totalCheques += cheque;
-        // }
-        // int totalPropertyValue = 0;
-        // for (Card c : allCards) {
-        //     totalPropertyValue += c.getQuality();
-        // }
-        // double marketValue = totalCheques / (double) totalPropertyValue;
-
         int currentMaxCheque = chequesAvailable.get(chequesAvailable.size() - 1);
         int maxOtherCard = otherCards.get(otherCards.size() - 1).getQuality();
         if (currentMaxCheque == allCheques.get(allCheques.size() - 1)) {
-            for (Card c : player.getCards()) {
-                if (c.getQuality() > maxOtherCard
-                    // || (chequesRemaining.contains(currentMaxCheque) && c.getQuality() > maxOtherCard - 1 && Math.random() < 0.5)
-                ) return c;
+            for (Card c : heldCards) {
+                if (c.getQuality() > maxOtherCard) {
+                    System.out.println("Playing " + c + " (" + c.getQuality() + ") for " + currentMaxCheque);
+                    return c;
+                }
             }
+            // for (Card c : heldCards) {
+            //     if (chequesRemaining.contains(currentMaxCheque)) {
+            //         if (c.getQuality() > maxOtherCard - 1) {
+            //             if (Math.random() < 0.5) return c;
+            //         }
+            //     }
+            // }
         }
-
-        // int currentMinCheque = chequesAvailable.get(0);
-        // if (currentMinCheque == 0) {
-        //     for (Card c : heldCards) {
-        //         // TODO: Tweak multiplier
-        //         if (c.getQuality() * marketValue * 1.5 > chequesAvailable.get(1)) return c;
-        //     }
-        // }
 
         return heldCards.get(0);
     }
