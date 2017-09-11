@@ -1,10 +1,12 @@
 package implementations;
 
+import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
 import forsale.AuctionState;
 import forsale.Card;
 import forsale.Player;
 import forsale.PlayerRecord;
 
+import java.util.Hashtable;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -15,12 +17,28 @@ public class SimulationStrategy implements BidStrategy {
 
     private PlayerRecord me;
     private int myBid;
-    private AuctionState auction_m;
+    private boolean new_round;
+    private boolean dropped_out = true;
+
+    private static double default_e = 0.0;
+    String names_m[]= new String[5];
+    double probs_m[] = new double[5];
+    static Hashtable<String, Double> otherStrats = new Hashtable<String, Double>();
+
 
     // converts a players bid 'score' to a probability.
-    private static double logistic(double x){
-        final double k = 0.13;
-        return 1.0/(1.0+Math.exp(-x*k));
+    private static double logistic(double x, double e){
+        final double k = 0.5;
+        return 1.0/(1.0+Math.exp(-(x+e)*k));
+    }
+
+    private double getE(String name){
+        Double e = otherStrats.get(name);
+        if (e == null){
+            otherStrats.put(name,default_e);
+            return default_e;
+        }
+        return e;
     }
 
     //
@@ -31,28 +49,18 @@ public class SimulationStrategy implements BidStrategy {
             return 0.0;
         }
 
-       /* int max_bid = player.getCash() / (round);
-
-        //Bid if the current bid is smaller than the max_bid.
-        if (nextBid <= max_bid ){
-            return 1.0;
-        }
-        return 0;*/
-
-
         double playerTarget = (double)player.getCash()/(round);
         //double value = 2*nextBid - 2*nextBid + (win - lose) - 10;
         double value = (win - lose)+2*playerTarget - 3*nextBid;
-        double prob = logistic(value);
+        double prob = logistic(value,getE(player.getName()));
         //System.out.println("Round " + String.valueOf(round) + " Prob "+ String.valueOf((prob) + "Value: "+String.valueOf(value)+" player cash: " + String.valueOf(player.getCash())+ " NextBid: " + String.valueOf(nextBid) + " win " + String.valueOf(win) + " lose "+ String.valueOf(lose)));
         return prob;
     }
 
     private double getCost(int cardGot, int moneyLost){
-        double averageSpent = 14.0/playerCount;
-        double playerSpend = (double)me.getCash()/(round);
 
-        return cardGot - 2.6*moneyLost;
+        //System.out.println(totalPropertyValuesRemaining);
+        return cardGot + - 2.6*moneyLost;
     }
 
 
@@ -90,6 +98,10 @@ public class SimulationStrategy implements BidStrategy {
         double prob = calculateProb(playersRemaining.get(index), nextBid , cards.get(finalCard), cards.get(0));
         double probDrop = 1.0 - prob;
 
+        if (new_round == true){
+            names_m [index-1] = playersRemaining.get(index).getName();
+            probs_m [index-1] = prob;
+        }
 
         ArrayList<Integer>  newCards = removeCard(cards, 0);
         ArrayList<PlayerRecord> newPlayers = removePlayer(playersRemaining,index);
@@ -112,9 +124,8 @@ public class SimulationStrategy implements BidStrategy {
 
     // Logic for how this Strategy would move
     public double myMove(ArrayList<PlayerRecord> playersRemaining, int nextBid, ArrayList<Integer> cards){
-        if (!playersRemaining.get(0).getName().equals(me.getName())){
-            System.out.println("Error: ");
-        }
+
+        new_round = false;
 
         if (playersRemaining.size() == 1){
             return getCost(cards.get(0),myBid);
@@ -134,21 +145,7 @@ public class SimulationStrategy implements BidStrategy {
             return costDrop;
         }
 
-        /*
-        System.out.println(String.valueOf(costDrop)+ " " + String.valueOf(costBid) );
-        //compare costs
-        if (costDrop > costBid ){
-            System.out.println("Money " + String.valueOf(player.getCash()) + " Round " + String.valueOf(round));
-            System.out.println("---------");
-            return -1;
-        }
-        if (player.getCash() < auction.getCurrentBid()+1){
-            System.out.println("Money " + String.valueOf(player.getCash()) + " Round " + String.valueOf(round));
-            System.out.println("---------");
-            System.out.println("too poor");
-        }*/
-
-        }
+    }
 
 
     @Override
@@ -170,14 +167,47 @@ public class SimulationStrategy implements BidStrategy {
         playerCount = auction.getPlayersInAuction().size();
         round = auction.getCardsInDeck().size()/auction.getPlayers().size() + 1;
         myBid = auction.getCurrentBid()+1;
+        new_round = true;
+
+        if (dropped_out == false){
+            int i = 1;
+            int iProb = 0;
+            for (String n : names_m) {
+                if (i < playerList.size()) {
+
+                    PlayerRecord p = playerList.get(i);
+                    if (p == null || n == null) {
+                        break;
+                    }
+                    if (n.equals(p.getName())) {
+                        double e = otherStrats.get(n);
+                        double newProb = e + 0.03 * (1.0 - probs_m[iProb]);
+                        otherStrats.put(n, newProb);
+                        i++;
+                    } else {
+                        double e = otherStrats.get(n);
+                        double newProb = e - 0.03 * (probs_m[iProb]);
+                        otherStrats.put(n, newProb);
+                    }
+                    iProb++;
+                }
+
+            }
+        }
+
+        probs_m = new double[5];
+        names_m = new String[5];
+
 
         double costDrop = getCost(cards.get(0),(me.getCurrentBid())/2);
         double costPlay = simulateRound(playerList,auction.getCurrentBid()+1,cards,1);
 
-        if (costPlay >= costDrop){
+        if (costPlay >= costDrop && player.getCash() >= auction.getCurrentBid() + 1){
+            dropped_out = false;
             return auction.getCurrentBid() + 1;
         }
 
+        dropped_out = true;
         // no bid
         return -1;
     }
